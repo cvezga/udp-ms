@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import udp.ms.AbstractMicroService;
 import udp.ms.Message;
@@ -24,6 +27,9 @@ public class SendorReader extends AbstractMicroService
     private SensorReaderProtocol protocol;
     
     private String sensorId;
+    
+    private List<DataPoint> dataPoints = new ArrayList<>();
+    private long removeDataTime;
 
     @Override
     public void init()
@@ -33,13 +39,23 @@ public class SendorReader extends AbstractMicroService
     }
 
     public String getSensorData(Message message) {
+        StringBuilder sb = new StringBuilder();
         
-        return null;
+        removeOldData();
+        
+        for(DataPoint dp : this.dataPoints)
+        {
+            sb.append( dp.getTime() ).append( "," ).append( dp.getValue() ).append( "," );
+        }
+        
+        return sb.toString();
     }
     
     @Override
     public void onCron()
     {
+        removeOldData();
+        
         Socket socket = null;
         try
         {
@@ -50,7 +66,7 @@ public class SendorReader extends AbstractMicroService
             InputStream is = socket.getInputStream();
             OutputStream os = socket.getOutputStream();
             
-            protocol.handle(is,os);
+            protocol.handle(dataPoints,is,os);
  
         }
         catch (SocketTimeoutException  e) {
@@ -77,6 +93,23 @@ public class SendorReader extends AbstractMicroService
             }
         }
     }
+    
+    private void removeOldData()
+    {
+        long now = System.currentTimeMillis();
+        long timeout = now - removeDataTime;
+        
+        Iterator<DataPoint> it = dataPoints.iterator();
+        while( it.hasNext() )
+        {
+            DataPoint dp = it.next();
+            if (  dp.getTime() < timeout) {
+                it.remove();
+            }
+        }
+        
+    }
+
 
     public void setIp( String ip )
     {
@@ -107,6 +140,12 @@ public class SendorReader extends AbstractMicroService
     public void setSensorId( String sensorId )
     {
         this.sensorId = sensorId;
+    }
+
+    
+    public void setRemoveDataTime( long removeDataTime )
+    {
+        this.removeDataTime = removeDataTime;
     }
 
 }
