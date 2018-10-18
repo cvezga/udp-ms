@@ -72,6 +72,15 @@ public abstract class AbstractMicroService implements MicroService<Message, Stri
 		}
 
 	}
+	
+	protected String join(String delitimer, Object... values) {
+	    StringBuilder sb = new StringBuilder();
+	    for(Object obj : values) {
+	        if(sb.length() > 0) sb.append( delitimer );
+	        sb.append( obj );
+	    }
+	    return sb.toString();
+	}
 
 	@Override
 	public void setMessageProcessor(MessageProcessor messageProcessor) {

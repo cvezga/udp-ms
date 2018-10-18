@@ -49,37 +49,32 @@ public class MonitorMS extends AbstractMicroService {
 	      
 	      Collections.sort(keys);
 	      
-	      sb.append("node,start_ts,current_ts,elapsed_ts,last_update_ts,hbCount,hbMaxRate,hbMinRate,hbRate,hbTime,usedMemory,freeMemory,totalMemory,maxMemory\n");
+	      sb.append("node,node_start_time,node_alive_time,node_loop_count,node_loop_rate,start_ts,current_ts,elapsed_ts,last_update_ts,hbCount,hbMaxRate,hbMinRate,hbRate,hbTime,usedMemory,freeMemory,totalMemory,maxMemory\n");
 	      
 	      for(String key : keys) {
 	    	  Monitor mntr = this.monitorMap.get(key);
-	    	  sb.append(mntr.nodeName);
-	    	  sb.append(",");
-	    	  sb.append(mntr.start_ts);
-	    	  sb.append(",");
-	    	  sb.append(mntr.current_ts);
-	    	  sb.append(",");
-	    	  sb.append(mntr.current_ts-mntr.start_ts);
-	    	  sb.append(",");
-	    	  sb.append(System.currentTimeMillis() - mntr.current_ts);
-	    	  sb.append(",");
-	    	  sb.append(mntr.hbCount);
-	    	  sb.append(","); 
-	    	  sb.append(mntr.hbMaxRate);
-	    	  sb.append(","); 
-	    	  sb.append(mntr.hbMinRate);
-	    	  sb.append(",");
-	    	  sb.append(mntr.hbRate);
-	    	  sb.append(",");
-	    	  sb.append(mntr.hbTime);
-	    	  sb.append(",");
-	    	  sb.append(mntr.usedMemory);
-	    	  sb.append(",");
-	    	  sb.append(mntr.freeMemory);
-	    	  sb.append(",");
-	    	  sb.append(mntr.totalMemory);
-	    	  sb.append(",");
-	    	  sb.append(mntr.maxMemory);
+	    	  sb.append(mntr.nodeName).append(",");
+	    	  sb.append(
+	    	          join(","
+	    	          ,mntr.nodeStartTime
+	    	          ,System.currentTimeMillis() - mntr.nodeStartTime
+	    	          ,mntr.nodeLoopCount
+	    	          ,mntr.nodeLoopCount / ( ( System.currentTimeMillis() - mntr.nodeStartTime ) / 1000.00 ) 
+                      ,mntr.start_ts
+        	    	  ,mntr.current_ts
+        	    	  ,mntr.current_ts-mntr.start_ts
+        	    	  ,System.currentTimeMillis() - mntr.current_ts
+        	    	  ,mntr.hbCount
+        	    	  ,mntr.hbMaxRate
+        	    	  ,mntr.hbMinRate
+        	    	  ,mntr.hbRate
+        	    	  ,mntr.hbTime
+        	    	  ,mntr.usedMemory
+        	    	  ,mntr.freeMemory
+        	    	  ,mntr.totalMemory
+        	    	  ,mntr.maxMemory)
+	    	  );
+	    	  
 	    	  sb.append("\n");
 	      }
 		
@@ -114,15 +109,20 @@ public class MonitorMS extends AbstractMicroService {
 		String nodeName = message.getNodeName();
 		String text = message.getMessageText();
 		String[] data = text.split(",");
-		float rate = Float.parseFloat(data[0]);
-		long count = Integer.parseInt(data[1]);
-		long elaptime = Integer.parseInt(data[2]);
-		long usedMemory = Long.parseLong(data[3]);
-		long freeMemory = Long.parseLong(data[4]);
-		long totalMemory =Long.parseLong(data[5]);
-		long maxMemory =Long.parseLong(data[6]);
+		int x=0;
+		long nodeStartTime = Long.parseLong(data[x++]);
+		long nodeLoopCount = Long.parseLong(data[x++]);
+		float rate = Float.parseFloat(data[x++]);
+		long count = Integer.parseInt(data[x++]);
+		long elaptime = Integer.parseInt(data[x++]);
+		long usedMemory = Long.parseLong(data[x++]);
+		long freeMemory = Long.parseLong(data[x++]);
+		long totalMemory =Long.parseLong(data[x++]);
+		long maxMemory =Long.parseLong(data[x++]);
 		Monitor m = this.monitorMap.get(nodeName);
 		if(m!=null) {
+		    m.nodeStartTime = nodeStartTime;
+		    m.nodeLoopCount = nodeLoopCount;
 			m.hbCount = count;
 			m.hbTime = elaptime;
 			m.hbRate = rate;
@@ -141,6 +141,8 @@ public class MonitorMS extends AbstractMicroService {
 
 	private class Monitor {
 		String nodeName;
+		long nodeStartTime;
+		long nodeLoopCount;
 		long hbCount;
 		long hbTime;
 		long start_ts;
@@ -159,7 +161,7 @@ public class MonitorMS extends AbstractMicroService {
         }
         @Override
         public String toString() {
-        	return nodeName+":"+hbCount+":"+hbTime+":"+hbRate+":"+hbMinRate+":"+hbMaxRate+":"+usedMemory+":"+freeMemory+":"+totalMemory+":"+maxMemory;
+        	return nodeStartTime+":"+nodeLoopCount+":"+nodeName+":"+hbCount+":"+hbTime+":"+hbRate+":"+hbMinRate+":"+hbMaxRate+":"+usedMemory+":"+freeMemory+":"+totalMemory+":"+maxMemory;
         }
 	}
 }

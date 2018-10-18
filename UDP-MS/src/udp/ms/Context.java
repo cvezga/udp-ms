@@ -9,6 +9,9 @@ public class Context {
 	
 	private Map<String,Object> prop = new HashMap<>();
 	
+	public long nodeLoopCount = 0;
+	public long nodeStartTime = 0;
+	
 	public void set(String key, Object value) {
 		prop.put(key, value);
 	}

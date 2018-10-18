@@ -1,5 +1,7 @@
 package udp.ms;
 
+import java.util.StringJoiner;
+
 import udp.MemoryUtil;
 
 public class HeartBeatMS extends AbstractMicroService {
@@ -29,7 +31,7 @@ public class HeartBeatMS extends AbstractMicroService {
 		
 		if(elapsetTime>=heartBeatTime) {
 		  float rate = 	count/(elapsetTime/1000f);
-		  send(heartBeatMonitor, rate+","+count+","+elapsetTime+","+MemoryUtil.getMemoryData());
+		  send(heartBeatMonitor, join(",", context.nodeStartTime, context.nodeLoopCount, rate, count, elapsetTime, MemoryUtil.getMemoryData()));
 		  lastReportedTime=time;
 		}
 		

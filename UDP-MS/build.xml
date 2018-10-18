@@ -1,0 +1,26 @@
+<project>
+
+	<target name="jar">
+		<tstamp>
+			<format property="TODAY"
+			          pattern="yyyyMMdd-HHmmss"
+			          locale="en,US"/>
+		</tstamp>
+		<mkdir dir="build/jar"/>
+		<jar destfile="build/jar/udpms-${TODAY}.jar" basedir="bin">
+			<manifest>
+				<attribute name="Main-Class" value="udp.ms.MSNode"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="deploy">
+		<exec executable="/bin/sh">
+		  <arg value="-c" />
+		  <arg value="rsync -ravh  -e 'ssh -i ~/.ssh/New2018.pem' . ec2-user@ec2-34-221-211-111.us-west-2.compute.amazonaws.com:/home/ec2-user/alpha/." />
+		</exec>
+	</target>
+
+	<target name="all" depends="jar,deploy" />
+	
+</project>

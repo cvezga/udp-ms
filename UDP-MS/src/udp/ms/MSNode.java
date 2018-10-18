@@ -15,8 +15,11 @@ public class MSNode {
 
 	private static Context context = new Context();
 	
+	
 	public static void main(String[] args)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	    
+	    context.nodeStartTime = System.currentTimeMillis();
 
 		String configFileName = args[0];
 		
@@ -52,6 +55,7 @@ public class MSNode {
 				cylceCount = 0;
 				sleep(100);
 			}
+			context.nodeLoopCount++;
 		}
 
 	}
