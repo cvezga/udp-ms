@@ -57,7 +57,7 @@ public class MonitorMS extends AbstractMicroService {
 	    	  sb.append(
 	    	          join(","
 	    	          ,mntr.nodeStartTime
-	    	          ,System.currentTimeMillis() - mntr.nodeStartTime
+	    	          ,formatTime( System.currentTimeMillis() - mntr.nodeStartTime )
 	    	          ,mntr.nodeLoopCount
 	    	          ,mntr.nodeLoopCount / ( ( System.currentTimeMillis() - mntr.nodeStartTime ) / 1000.00 ) 
                       ,mntr.start_ts
@@ -81,6 +81,19 @@ public class MonitorMS extends AbstractMicroService {
 	      return sb.toString();
 	}
 
+	private long DAY = 1000 * 60 * 60 * 24;
+	private long HH = 1000 * 60 * 60;
+	private long MM = 1000 * 60;
+	private String formatTime(long time) {
+	    int dd = ( int ) ( time / DAY ); 
+	    time -=dd;
+	    int hh = ( int ) ( time / HH );
+	    time -=hh;
+	    int mm = ( int ) ( time / MM );
+        
+	    return hh+"d "+hh+"h "+mm+"m";
+        
+	}
 
 
 	@Override
