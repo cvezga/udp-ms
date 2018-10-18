@@ -53,13 +53,13 @@ public class MonitorMS extends AbstractMicroService {
 	      
 	      for(String key : keys) {
 	    	  Monitor mntr = this.monitorMap.get(key);
-	    	  sb.append(mntr.nodeName).append(",");
-	    	  sb.append(
-	    	          join(","
-	    	          ,mntr.nodeStartTime
-	    	          ,formatTime( System.currentTimeMillis() - mntr.nodeStartTime )
-	    	          ,mntr.nodeLoopCount
-	    	          ,mntr.nodeLoopCount / ( ( System.currentTimeMillis() - mntr.nodeStartTime ) / 1000.00 ) 
+	    	  
+	    	  String row = join(","
+        	          ,mntr.nodeName
+        	          ,mntr.nodeStartTime
+        	          ,formatTime( System.currentTimeMillis() - mntr.nodeStartTime )
+        	          ,mntr.nodeLoopCount
+        	          ,mntr.nodeLoopCount / ( ( System.currentTimeMillis() - mntr.nodeStartTime ) / 1000.00 ) 
                       ,mntr.start_ts
         	    	  ,mntr.current_ts
         	    	  ,mntr.current_ts-mntr.start_ts
@@ -72,10 +72,11 @@ public class MonitorMS extends AbstractMicroService {
         	    	  ,mntr.usedMemory
         	    	  ,mntr.freeMemory
         	    	  ,mntr.totalMemory
-        	    	  ,mntr.maxMemory)
+        	    	  ,mntr.maxMemory
 	    	  );
 	    	  
-	    	  sb.append("\n");
+	    	  sb.append( row ).append( "\n" );
+	    	  
 	      }
 		
 	      return sb.toString();
