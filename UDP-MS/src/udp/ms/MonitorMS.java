@@ -87,9 +87,9 @@ public class MonitorMS extends AbstractMicroService {
 	private long MM = 1000 * 60;
 	private String formatTime(long time) {
 	    int dd = ( int ) ( time / DAY ); 
-	    time -=dd;
+	    time -=dd*DAY;
 	    int hh = ( int ) ( time / HH );
-	    time -=hh;
+	    time -=hh*HH;
 	    int mm = ( int ) ( time / MM );
         
 	    return hh+"d "+hh+"h "+mm+"m";
